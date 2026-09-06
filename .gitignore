@@ -1,0 +1,23 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directories
+node_modules/
+
+# Build
+dist/
+
+# Env
+.env
+
+# Temporary / Debug Files
+test-routes.ts
+debug-routes.ts
+
+# Documentation & Collections
+cron-monitor-documentation.md
+cron-monitor-implementation-plan.md
+cron-monitor.postman_collection.json
+job-schema-documentation.md
