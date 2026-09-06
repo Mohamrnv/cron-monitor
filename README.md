@@ -252,7 +252,8 @@ At the expected scale (< 1,000 jobs), a simple polling query is not a bottleneck
 
 - [x] Job CRUD API (Create, Read)
 - [x] Ping success endpoint
-- [ ] Ping start & fail endpoints
+- [ ] Ping start endpoint
+- [x] Ping fail endpoint
 - [ ] Background worker (overdue job detection)
 - [ ] Email alerts via Nodemailer
 - [ ] Slack webhook notifications
