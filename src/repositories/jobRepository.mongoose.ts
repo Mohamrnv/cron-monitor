@@ -3,8 +3,29 @@ import { Job } from "../types/job.js";
 import JobModel, { JobStatus } from "../models/Job.model.js";
 class JobRepositoryMongoose implements IJobRepository {
     async findOverdueJobs(): Promise<Job[]> {
+        const now = new Date();
+        
+        // High-performance MongoDB query using $expr
+        // Calculates (lastPingAt + (expectedInterval + gracePeriod) * 1000) < now directly in the database
         return JobModel.find({
-            status: JobStatus.LATE
+            status: JobStatus.HEALTHY,
+            lastPingAt: { $ne: null },
+            $expr: {
+                $lt: [
+                    {
+                        $add: [
+                            "$lastPingAt",
+                            {
+                                $multiply: [
+                                    { $add: ["$expectedIntervalSeconds", { $ifNull: ["$gracePeriodSeconds", 0] }] },
+                                    1000
+                                ]
+                            }
+                        ]
+                    },
+                    now
+                ]
+            }
         }).lean().exec();
     }
     async createJob(data: Partial<Job>): Promise<Job> {
