@@ -261,8 +261,3 @@ At the expected scale (< 1,000 jobs), a simple polling query is not a bottleneck
 - [ ] Multi-user support with authentication
 - [ ] Public status page per job
 
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
