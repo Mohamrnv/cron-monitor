@@ -43,5 +43,35 @@ export const pingController = {
             console.error('Error handling ping success:', error);
             return res.status(500).json({ error: 'Internal server error' });
         }
+    },
+
+    pingFail: async (req: Request<pingInterface>, res: Response) => {
+        try {
+            const { token } = req.params;
+            
+            // 1. Look up job by token
+            const job = await jobRepository.findByToken(token);
+            if (!job) {
+                return res.status(404).json({ error: 'Job not found for provided token' });
+            }
+
+            // 2. Prepare updates to set status to DOWN immediately
+            const updates: any = {
+                status: JobStatus.DOWN,
+            };
+            
+            // 3. Update the job
+            await jobRepository.update((job as any)._id.toString(), updates);
+
+            logger.warn(`Job ${job.name} (ID: ${(job as any)._id}) explicitly failed via /fail ping! Status set to DOWN.`);
+            
+            // TODO: Trigger alert immediately
+
+            // 4. Respond quickly
+            return res.status(200).send('OK');
+        } catch (error) {
+            console.error('Error handling ping fail:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
     }
 };
