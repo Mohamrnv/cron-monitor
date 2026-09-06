@@ -7,4 +7,5 @@ export interface IJobRepository {
   update(jobId: string, data: Partial<Job>): Promise<Job | null>;
   findAll(): Promise<Job[]>;
   findById(id: string): Promise<Job | null>;
+  markAsDown(jobId: string): Promise<Job | null>;
 }

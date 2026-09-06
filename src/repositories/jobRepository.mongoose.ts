@@ -43,5 +43,8 @@ class JobRepositoryMongoose implements IJobRepository {
     async findById(id: string): Promise<Job | null> {
         return JobModel.findById(id).lean().exec();
     }
+    async markAsDown(jobId: string): Promise<Job | null> {
+        return this.update(jobId, { status: JobStatus.DOWN });
+    }
 }
 export const jobRepository = new JobRepositoryMongoose();
