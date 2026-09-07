@@ -11,8 +11,8 @@ const jobSchema = new Schema<Job>({
   pingToken: { type: String, required: true, unique: true },
   expectedIntervalSeconds: { type: Number, required: true },
   gracePeriodSeconds: { type: Number, default: 300 },
-  status: { type: String, enum: Object.values(JobStatus), default: JobStatus.HEALTHY },
-  lastPingAt: { type: Date, default: null },
+  status: { type: String, enum: Object.values(JobStatus), default: JobStatus.HEALTHY, index: true },
+  lastPingAt: { type: Date, default: null, index: true },
   lastStartedAt: { type: Date, default: null },
 }, { timestamps: true });
 
