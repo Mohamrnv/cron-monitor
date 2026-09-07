@@ -18,8 +18,12 @@ export const pingController = {
             }
 
             // 2. Prepare updates
+            const now = new Date();
+            const nextExpected = new Date(now.getTime() + (job.expectedIntervalSeconds + (job.gracePeriodSeconds || 0)) * 1000);
+            
             const updates: any = {
-                lastPingAt: new Date(),
+                lastPingAt: now,
+                nextExpectedPingAt: nextExpected,
             };
             
             // If it was down, recover it

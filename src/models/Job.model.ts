@@ -12,7 +12,8 @@ const jobSchema = new Schema<Job>({
   expectedIntervalSeconds: { type: Number, required: true },
   gracePeriodSeconds: { type: Number, default: 300 },
   status: { type: String, enum: Object.values(JobStatus), default: JobStatus.HEALTHY, index: true },
-  lastPingAt: { type: Date, default: null, index: true },
+  lastPingAt: { type: Date, default: null },
+  nextExpectedPingAt: { type: Date, default: null, index: true },
   lastStartedAt: { type: Date, default: null },
 }, { timestamps: true });
 

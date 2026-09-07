@@ -5,27 +5,10 @@ class JobRepositoryMongoose implements IJobRepository {
     async findOverdueJobs(): Promise<Job[]> {
         const now = new Date();
         
-        // High-performance MongoDB query using $expr
-        // Calculates (lastPingAt + (expectedInterval + gracePeriod) * 1000) < now directly in the database
+        // High-performance index lookup using pre-calculated nextExpectedPingAt
         return JobModel.find({
             status: JobStatus.HEALTHY,
-            lastPingAt: { $ne: null },
-            $expr: {
-                $lt: [
-                    {
-                        $add: [
-                            "$lastPingAt",
-                            {
-                                $multiply: [
-                                    { $add: ["$expectedIntervalSeconds", { $ifNull: ["$gracePeriodSeconds", 0] }] },
-                                    1000
-                                ]
-                            }
-                        ]
-                    },
-                    now
-                ]
-            }
+            nextExpectedPingAt: { $ne: null, $lt: now }
         }).lean().exec();
     }
     async createJob(data: Partial<Job>): Promise<Job> {

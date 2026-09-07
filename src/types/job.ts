@@ -7,6 +7,7 @@ export interface Job {
   gracePeriodSeconds: number;
   status: JobStatus;
   lastPingAt: Date | null;
+  nextExpectedPingAt: Date | null;
   lastStartedAt: Date | null;
   createdAt: Date;
 }
