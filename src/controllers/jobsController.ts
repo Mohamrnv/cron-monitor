@@ -19,12 +19,17 @@ export const jobsController = {
                 return res.status(400).json({ error: 'Name and expectedIntervalSeconds are required' });
             }
 
+            const gracePeriod = gracePeriodSeconds !== undefined ? gracePeriodSeconds : 300;
+            const now = new Date();
+            const nextExpected = new Date(now.getTime() + (expectedIntervalSeconds + gracePeriod) * 1000);
+
             // Create the job via repository
             const newJob = await jobRepository.createJob({
                 name,
                 expectedIntervalSeconds,
-                gracePeriodSeconds: gracePeriodSeconds || 300,
+                gracePeriodSeconds: gracePeriod,
                 pingToken: uuidv4(),
+                nextExpectedPingAt: nextExpected
             });
 
             return res.status(201).json(newJob);
