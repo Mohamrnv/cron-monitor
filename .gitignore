@@ -20,5 +20,6 @@ debug-routes.ts
 # Documentation & Collections
 cron-monitor-documentation.md
 cron-monitor-implementation-plan.md
+cron-monitor-frontend-documentation.md
 cron-monitor.postman_collection.json
 job-schema-documentation.md
