@@ -44,7 +44,7 @@ export const pingController = {
             // 5. Respond quickly
             return res.status(200).send('OK');
         } catch (error) {
-            console.error('Error handling ping success:', error);
+            logger.error(`Error handling ping success: ${error}`);
             return res.status(500).json({ error: 'Internal server error' });
         }
     },
@@ -74,7 +74,7 @@ export const pingController = {
             // 4. Respond quickly
             return res.status(200).send('OK');
         } catch (error) {
-            console.error('Error handling ping fail:', error);
+            logger.error(`Error handling ping fail: ${error}`);
             return res.status(500).json({ error: 'Internal server error' });
         }
     },
@@ -100,7 +100,7 @@ export const pingController = {
             // 4. Respond quickly
             return res.status(200).send('OK');
         } catch (error) {
-            console.error('Error handling ping start:', error);
+            logger.error(`Error handling ping start: ${error}`);
             return res.status(500).json({ error: 'Internal server error' });
         }
     }

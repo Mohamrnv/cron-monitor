@@ -12,7 +12,7 @@
     "build:run": "npm run build && npm run start"
   },
   "keywords": [],
-  "author": "",
+  "author": "Mohamed Samir",
   "dependencies": {
     "dotenv": "^17.4.2",
     "express": "^5.2.1",

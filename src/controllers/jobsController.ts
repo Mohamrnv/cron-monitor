@@ -2,11 +2,9 @@ import { Request, Response } from 'express';
 import { jobRepository } from '../repositories/jobRepository.mongoose.js';
 import { v4 as uuidv4 } from 'uuid';
 import { PingModel } from '../models/Ping.model.js';
-export interface CreateJobDto {
-    name: string;
-    expectedIntervalSeconds: number;
-    gracePeriodSeconds?: number;
-}
+import { logger } from '../config/logger.js';
+import { CreateJobDto } from '../types/job.dto.js';
+
 interface JobParams {
     id: string;
 }
@@ -31,7 +29,7 @@ export const jobsController = {
 
             return res.status(201).json(newJob);
         } catch (error) {
-            console.error('Error creating job:', error);
+            logger.error(`Error creating job: ${error}`);
             return res.status(500).json({ error: 'Internal server error' });
         }
     },
@@ -41,7 +39,7 @@ export const jobsController = {
             const jobs = await jobRepository.findAll();
             return res.status(200).json(jobs);
         } catch (error) {
-            console.error('Error fetching jobs:', error);
+            logger.error(`Error fetching jobs: ${error}`);
             return res.status(500).json({ error: 'Internal server error' });
         }
     },
@@ -63,7 +61,7 @@ export const jobsController = {
 
             return res.status(200).json({ job, pings });
         } catch (error) {
-            console.error('Error fetching job by ID:', error);
+            logger.error(`Error fetching job by ID: ${error}`);
             return res.status(500).json({ error: 'Internal server error' });
         }
     }
