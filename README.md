@@ -13,6 +13,8 @@
   <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Express-5.x-000000?logo=express&logoColor=white" alt="Express" />
   <img src="https://img.shields.io/badge/MongoDB-Mongoose-47A248?logo=mongodb&logoColor=white" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white" alt="React" />
+  <img src="https://img.shields.io/badge/Vite-Frontend-646CFF?logo=vite&logoColor=white" alt="Vite" />
 </p>
 
 ---
@@ -23,7 +25,7 @@ Cron jobs run silently in the background. When they fail — due to server crash
 
 ## 💡 The Solution
 
-Cron Monitor expects periodic **heartbeat pings** from your scheduled jobs. If an expected ping doesn't arrive within a defined grace period, the service alerts your team via email or Slack.
+Cron Monitor expects periodic **heartbeat pings** from your scheduled jobs. If an expected ping doesn't arrive within a defined grace period, the service alerts your team via email.
 
 > Similar to [Healthchecks.io](https://healthchecks.io), [Cronitor](https://cronitor.io), and [Dead Man's Snitch](https://deadmanssnitch.com).
 
@@ -34,8 +36,8 @@ Cron Monitor expects periodic **heartbeat pings** from your scheduled jobs. If a
 ```
 ┌──────────────┐       ┌──────────────────┐       ┌─────────────┐
 │  Your Server │       │   Cron Monitor   │       │  Alert      │
-│  (cron job)  │──────▶│   (this API)     │──────▶│  (Email /   │
-│              │ ping  │                  │ alert │   Slack)    │
+│  (cron job)  │──────▶│   (this API)     │──────▶│  (Email)    │
+│              │ ping  │                  │ alert │             │
 └──────────────┘       └──────────────────┘       └─────────────┘
 ```
 
@@ -50,36 +52,54 @@ Cron Monitor expects periodic **heartbeat pings** from your scheduled jobs. If a
    curl https://your-monitor.com/ping/your-unique-token
    ```
 4. A **background worker** continuously checks: *"Has this job pinged within its expected window?"*
-5. If a job misses its expected ping → **alert is triggered**.
+5. If a job misses its expected ping → **alert is triggered** and an email is sent.
 
 ---
 
 ## 🏗️ Tech Stack
 
-| Layer              | Technology          | Reason                                           |
-| ------------------ | ------------------- | ------------------------------------------------ |
+### Backend
+| Layer              | Technology           | Reason                                           |
+| ------------------ | -------------------- | ------------------------------------------------ |
 | **Runtime**        | Node.js + TypeScript | Type safety, modern async/await patterns          |
-| **Framework**      | Express 5           | Lightweight, widely used, easy to extend          |
-| **Database**       | MongoDB + Mongoose  | Flexible schema, fast reads for ping data         |
-| **Background Jobs**| node-cron           | Periodic check for overdue jobs every 60 seconds  |
-| **Notifications**  | Nodemailer, Slack   | Simple integration, no complex auth needed        |
-| **Logging**        | Winston             | Structured logging with file and console output   |
+| **Framework**      | Express 5            | Lightweight, widely used, easy to extend          |
+| **Database**       | MongoDB + Mongoose   | Flexible schema, fast reads for ping data         |
+| **Background Jobs**| node-cron            | Periodic check for overdue jobs every 60 seconds  |
+| **Notifications**  | Nodemailer           | Simple SMTP integration (Mailtrap for dev)        |
+| **Logging**        | Winston              | Structured logging with file and console output   |
+
+### Frontend
+| Layer          | Technology              | Reason                                          |
+| -------------- | ----------------------- | ----------------------------------------------- |
+| **Framework**  | React 18 + TypeScript   | Type safety, component-driven UI                |
+| **Build Tool** | Vite                    | Fast HMR, modern bundling                       |
+| **Styling**    | Tailwind CSS v3         | Utility-first, custom dark design system        |
+| **Data**       | React Query (TanStack)  | Auto-refresh every 10s, caching, mutations      |
+| **Routing**    | React Router v6         | Dashboard + Job Details pages                   |
 
 ---
 
 ## 📁 Project Structure
 
 ```
-src/
-├── config/             # Database connection, logger setup
-├── controllers/        # Request handlers (jobsController, pingController)
-├── models/             # Mongoose schemas (Job, Ping, Alert)
-├── repositories/       # Data access layer (Repository Pattern)
-├── routes/             # Express route definitions
-├── services/           # Background worker, alert service
-├── types/              # TypeScript interfaces (Job, Ping, Alert)
-├── app.ts              # Express app configuration & middleware
-└── server.ts           # Entry point — starts server & connects DB
+cron-monitor/
+├── src/                        # Backend (Node.js + Express)
+│   ├── config/                 # Database connection, logger setup
+│   ├── controllers/            # Request handlers (jobsController, pingController)
+│   ├── models/                 # Mongoose schemas (Job, Ping, Alert)
+│   ├── repositories/           # Data access layer (Repository Pattern)
+│   ├── routes/                 # Express route definitions
+│   ├── services/               # Background worker, alert service
+│   ├── types/                  # TypeScript interfaces (Job, Ping, Alert)
+│   ├── app.ts                  # Express app configuration & middleware
+│   └── server.ts               # Entry point — starts server & connects DB
+└── frontend/                   # Frontend (React + Vite)
+    └── src/
+        ├── api/                # Centralized API calls
+        ├── components/         # StatusBadge, JobCard, Navbar, Modal, etc.
+        ├── hooks/              # React Query hooks (useJobs, useCreateJob)
+        ├── pages/              # DashboardPage, JobDetailsPage
+        └── types/              # Shared TypeScript types
 ```
 
 ---
@@ -91,45 +111,60 @@ src/
 - **Node.js** v18+
 - **MongoDB** running locally or a cloud instance (e.g., MongoDB Atlas)
 
-### Installation
+### Backend Setup
 
 ```bash
 # Clone the repository
 git clone https://github.com/Mohamrnv/cron-monitor.git
 cd cron-monitor
 
-# Install dependencies
+# Install backend dependencies
 npm install
 
 # Create your environment file
-cp .env.example .env
-# Edit .env with your MongoDB URI and other settings
 ```
-
-### Environment Variables
 
 Create a `.env` file in the project root:
 
 ```env
 PORT=3000
 MONGO_URI=mongodb://localhost:27017/cron-monitor
-```
 
-### Running
+# Mailtrap (for development email testing)
+SMTP_HOST=sandbox.smtp.mailtrap.io
+SMTP_PORT=587
+SMTP_USER=your_mailtrap_user
+SMTP_PASS=your_mailtrap_pass
+ALERT_EMAIL=your@email.com
+```
 
 ```bash
-# Development (auto-reload on file changes)
+# Start backend in development mode
 npm run dev
-
-# Build for production
-npm run build
-
-# Start production server
-npm start
-
-# Build and run in one command
-npm run build:run
 ```
+
+### Frontend Setup
+
+```bash
+cd frontend
+
+# Install frontend dependencies
+npm install
+
+# Create frontend env file
+echo "VITE_API_URL=http://localhost:3000" > .env
+
+# Start frontend dev server
+npm run dev
+```
+
+Open **http://localhost:5173** to view the dashboard.
+
+### Running Both Simultaneously
+
+Open two separate terminals:
+- Terminal 1 (root): `npm run dev` → API on port `3000`
+- Terminal 2 (frontend/): `npm run dev` → Dashboard on port `5173`
 
 ---
 
@@ -148,11 +183,9 @@ npm run build:run
 | POST   | `/api/jobs`       | Create a new monitored job               |
 | GET    | `/api/jobs`       | List all monitored jobs                  |
 | GET    | `/api/jobs/:id`   | Get job details + last 20 pings          |
-| PATCH  | `/api/jobs/:id`   | Update job settings                      |
 | DELETE | `/api/jobs/:id`   | Delete a job                             |
-| POST   | `/api/jobs/:id/pause` | Pause / resume monitoring            |
 
-### Ping Endpoints (Public)
+### Ping Endpoints
 
 | Method | Endpoint              | Description                           |
 | ------ | --------------------- | ------------------------------------- |
@@ -163,13 +196,6 @@ npm run build:run
 ### Example: Create a Job
 
 ```bash
-# PowerShell
-Invoke-RestMethod -Uri "http://localhost:3000/api/jobs" `
-  -Method Post `
-  -Headers @{ "Content-Type" = "application/json" } `
-  -Body '{"name":"Nightly Backup","expectedIntervalSeconds":86400,"gracePeriodSeconds":3600}'
-
-# curl (Linux/macOS)
 curl -X POST http://localhost:3000/api/jobs \
   -H "Content-Type: application/json" \
   -d '{"name":"Nightly Backup","expectedIntervalSeconds":86400,"gracePeriodSeconds":3600}'
@@ -185,7 +211,7 @@ curl -X POST http://localhost:3000/api/jobs \
   "gracePeriodSeconds": 3600,
   "status": "healthy",
   "lastPingAt": null,
-  "lastStartedAt": null,
+  "nextExpectedPingAt": "2026-09-07T20:44:53.885Z",
   "createdAt": "2026-09-06T19:44:53.885Z"
 }
 ```
@@ -207,18 +233,10 @@ curl http://localhost:3000/ping/0ec77015-b1d7-411b-b92a-b3988ef9db71
                   │  (pinging on time) │
                   └────────┬───────────┘
                            │
-              missed expectedInterval
+              missed expectedInterval + gracePeriod
                            │
                   ┌────────▼───────────┐
-                  │       LATE         │
-                  │  (within grace     │
-                  │   period)          │
-                  └────────┬───────────┘
-                           │
-              missed grace period
-                           │
-                  ┌────────▼───────────┐
-                  │       DOWN         │──── Alert Sent (Email/Slack)
+                  │       DOWN         │──── Alert Sent (Email)
                   │  (alert triggered) │
                   └────────┬───────────┘
                            │
@@ -230,7 +248,11 @@ curl http://localhost:3000/ping/0ec77015-b1d7-411b-b92a-b3988ef9db71
                   └────────────────────┘
 ```
 
-A job can also be manually set to **PAUSED**, which stops all monitoring checks until resumed.
+### Alert Cooldown
+
+- When a job goes `DOWN`, **only one alert is sent**.
+- No repeated alerts while the job stays down (no spam).
+- The cooldown resets only when the job **recovers** (`HEALTHY`) and goes down again.
 
 ---
 
@@ -242,23 +264,30 @@ Controllers never touch Mongoose directly. All database operations go through a 
 - **Testability:** Repositories can be mocked in unit tests.
 - **Flexibility:** Swapping MongoDB for PostgreSQL only requires a new repository implementation.
 
+### Why Polling Instead of WebSockets?
+
+The frontend refreshes data every 10 seconds using React Query's `refetchInterval`. A 10-second delay in status visibility is not critical for this use case. WebSockets would add persistent connection complexity with no real benefit at this scale. This follows the same "start simple, document the decision" approach used throughout the project.
+
 ### Why Not Redis + BullMQ (Yet)?
 
-At the expected scale (< 1,000 jobs), a simple polling query is not a bottleneck. Adding Redis introduces operational complexity without a justified trade-off. The scaling path is documented and ready for when it's needed.
+At the expected scale (< 1,000 jobs), a simple polling query against MongoDB is not a bottleneck. The background worker uses a pre-calculated `nextExpectedPingAt` index for lightning-fast lookups. Adding Redis introduces operational complexity without a justified trade-off.
 
 ---
 
 ## 📋 Roadmap
 
-- [x] Job CRUD API (Create, Read)
+- [x] Job CRUD API (Create, Read, Delete)
 - [x] Ping success endpoint
 - [x] Ping start endpoint
 - [x] Ping fail endpoint
 - [x] Background worker (overdue job detection)
 - [x] Email alerts via Nodemailer
+- [x] Alert cooldown (no duplicate alerts)
+- [x] React dashboard (job list, status badges, auto-refresh)
+- [x] Create job modal with ping URL display
+- [x] Job details page with ping history
 - [ ] Slack webhook notifications
-- [ ] Frontend dashboard
-- [ ] Cron expression parsing
+- [ ] Cron expression parsing (e.g., `0 2 * * *`)
 - [ ] Multi-user support with authentication
 - [ ] Public status page per job
-
+- [ ] Deployment (Railway / Render)
