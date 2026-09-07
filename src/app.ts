@@ -1,7 +1,15 @@
 import express, { Express, Request, Response } from 'express';
+import cors from 'cors';
 import jobsRouter from './routes/jobs.js';
 
 const app: Express = express();
+
+// CORS — allow the React frontend dev server (and future production domain)
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+}));
+
 
 // Middleware
 app.use(express.json());

@@ -69,5 +69,19 @@ export const jobsController = {
             logger.error(`Error fetching job by ID: ${error}`);
             return res.status(500).json({ error: 'Internal server error' });
         }
+    },
+
+    deleteJob: async (req: Request<JobParams>, res: Response) => {
+        try {
+            const { id } = req.params;
+            await jobRepository.update(id, {});
+            // Delete from DB directly using the model
+            const JobModel = (await import('../models/Job.model.js')).default;
+            await JobModel.findByIdAndDelete(id);
+            return res.status(204).send();
+        } catch (error) {
+            logger.error(`Error deleting job: ${error}`);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
     }
 };
