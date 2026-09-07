@@ -9,5 +9,6 @@ export interface Job {
   lastPingAt: Date | null;
   nextExpectedPingAt: Date | null;
   lastStartedAt: Date | null;
+  lastAlertSentAt?: Date | null;
   createdAt: Date;
 }

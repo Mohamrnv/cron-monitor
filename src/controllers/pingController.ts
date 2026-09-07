@@ -3,6 +3,8 @@ import { jobRepository } from '../repositories/jobRepository.mongoose.js';
 import { PingModel } from '../models/Ping.model.js';
 import { JobStatus } from '../models/Job.model.js';
 import { logger } from '../config/logger.js';
+import { sendAlert } from '../services/alertService.js';
+
 interface pingInterface {
     token:string
 }
@@ -60,6 +62,7 @@ export const pingController = {
             }
 
             // 2. Prepare updates to set status to DOWN immediately
+            const wasHealthy = job.status !== JobStatus.DOWN;
             const updates: any = {
                 status: JobStatus.DOWN,
             };
@@ -69,7 +72,9 @@ export const pingController = {
 
             logger.warn(`Job ${job.name} (ID: ${(job as any)._id}) explicitly failed via /fail ping! Status set to DOWN.`);
             
-            // TODO: Trigger alert immediately
+            if (wasHealthy) {
+                await sendAlert(job);
+            }
 
             // 4. Respond quickly
             return res.status(200).send('OK');
