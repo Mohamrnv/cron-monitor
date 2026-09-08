@@ -5,4 +5,5 @@ router.post('/', jobsController.createJob);
 router.get('/', jobsController.getJobs);
 router.get('/:id', jobsController.getJobById);
 router.delete('/:id', jobsController.deleteJob);
+router.patch('/:id', jobsController.updateJob);
 export default router;

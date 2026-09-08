@@ -1,4 +1,4 @@
-import type { Job, CreateJobDto, Ping } from '../types/job';
+import type { Job, CreateJobDto, UpdateJobDto, Ping } from '../types/job';
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
 
@@ -21,6 +21,16 @@ export async function createJob(data: CreateJobDto): Promise<Job> {
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error('Failed to create job');
+  return res.json();
+}
+
+export async function updateJob(id: string, data: UpdateJobDto): Promise<Job> {
+  const res = await fetch(`${BASE_URL}/api/jobs/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Failed to update job');
   return res.json();
 }
 

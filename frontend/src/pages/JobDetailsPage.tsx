@@ -1,10 +1,12 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { formatDistanceToNow, format } from 'date-fns';
-import { ArrowLeft, Trash2, Terminal } from 'lucide-react';
+import { ArrowLeft, Trash2, Terminal, Edit2 } from 'lucide-react';
 import { useJob, useDeleteJob } from '../hooks/useJobs';
 import { StatusBadge } from '../components/StatusBadge';
 import { CopyPingUrl } from '../components/CopyPingUrl';
 import { getPingUrl } from '../api/jobsApi';
+import { EditJobModal } from '../components/EditJobModal';
 
 function formatInterval(seconds: number): string {
   if (seconds < 60) return `${seconds} seconds`;
@@ -18,6 +20,7 @@ export function JobDetailsPage() {
   const navigate = useNavigate();
   const { data, isLoading, isError } = useJob(id!);
   const deleteMutation = useDeleteJob();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const handleDelete = async () => {
     if (!window.confirm(`Delete "${data?.job.name}"? This cannot be undone.`)) return;
@@ -58,9 +61,14 @@ export function JobDetailsPage() {
           <h1 className="font-serif text-3xl text-slate-100 mb-2">{job.name}</h1>
           <StatusBadge status={job.status} />
         </div>
-        <button id="delete-job-btn" onClick={handleDelete} className="btn-danger shrink-0" disabled={deleteMutation.isPending}>
-          <Trash2 size={14} /> Delete
-        </button>
+        <div className="flex gap-2">
+          <button onClick={() => setIsEditModalOpen(true)} className="btn-ghost shrink-0">
+            <Edit2 size={14} /> Edit
+          </button>
+          <button id="delete-job-btn" onClick={handleDelete} className="btn-danger shrink-0" disabled={deleteMutation.isPending}>
+            <Trash2 size={14} /> Delete
+          </button>
+        </div>
       </div>
 
       {/* Details grid */}
@@ -124,6 +132,10 @@ export function JobDetailsPage() {
           </div>
         )}
       </div>
+
+      {isEditModalOpen && (
+        <EditJobModal job={job} onClose={() => setIsEditModalOpen(false)} />
+      )}
     </main>
   );
 }
