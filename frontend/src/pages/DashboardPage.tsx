@@ -6,10 +6,10 @@ import { EmptyState } from '../components/EmptyState';
 import { CreateJobModal } from '../components/CreateJobModal';
 import type { Job } from '../types/job';
 
-function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
+function StatCard({ label, value, color, delay = '' }: { label: string; value: number; color: string; delay?: string }) {
   return (
-    <div className="stat-card">
-      <span className={`text-3xl font-serif ${color}`}>{value}</span>
+    <div className={`stat-card animate-fadeInUp ${delay}`}>
+      <span className={`text-3xl font-serif ${color} animate-countUp`}>{value}</span>
       <span className="text-xs text-slate-500 uppercase tracking-wider">{label}</span>
     </div>
   );
@@ -27,7 +27,7 @@ export function DashboardPage() {
   return (
     <main className="max-w-6xl mx-auto px-6 py-10">
       {/* Hero header */}
-      <div className="flex items-end justify-between mb-10">
+      <div className="flex items-end justify-between mb-10 animate-fadeInDown">
         <div>
           <h1 className="font-serif text-4xl text-slate-100 mb-1">Dashboard</h1>
           <p className="text-slate-500 text-sm">Real-time status of your monitored cron jobs</p>
@@ -40,10 +40,10 @@ export function DashboardPage() {
       {/* Stats row */}
       {total > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-          <StatCard label="Total" value={total} color="text-slate-200" />
-          <StatCard label="Healthy" value={healthy} color="text-emerald-400" />
-          <StatCard label="Late" value={late} color="text-amber-400" />
-          <StatCard label="Down" value={down} color="text-red-400" />
+          <StatCard label="Total"   value={total}   color="text-slate-200"   delay="stagger-1" />
+          <StatCard label="Healthy" value={healthy} color="text-emerald-400" delay="stagger-2" />
+          <StatCard label="Late"    value={late}    color="text-amber-400"   delay="stagger-3" />
+          <StatCard label="Down"    value={down}    color="text-red-400"     delay="stagger-4" />
         </div>
       )}
 
@@ -98,8 +98,14 @@ export function DashboardPage() {
       {/* Job grid */}
       {!isLoading && !isError && total > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {jobs!.map((job: Job) => (
-            <JobCard key={job._id} job={job} />
+          {jobs!.map((job: Job, i: number) => (
+            <div
+              key={job._id}
+              className="animate-fadeInUp"
+              style={{ animationDelay: `${i * 0.06}s` }}
+            >
+              <JobCard job={job} />
+            </div>
           ))}
         </div>
       )}

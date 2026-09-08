@@ -45,19 +45,78 @@ export default {
           '100%': { backgroundPosition: '200% 0' },
         },
         fadeInUp: {
-          '0%': { opacity: '0', transform: 'translateY(8px)' },
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        fadeInDown: {
+          '0%': { opacity: '0', transform: 'translateY(-10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
         scaleIn: {
-          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '0%': { opacity: '0', transform: 'scale(0.94)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        scaleOut: {
+          '0%': { opacity: '1', transform: 'scale(1)' },
+          '100%': { opacity: '0', transform: 'scale(0.94)' },
+        },
+        slideInRight: {
+          '0%': { opacity: '0', transform: 'translateX(20px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        slideInLeft: {
+          '0%': { opacity: '0', transform: 'translateX(-20px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        backdropIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        modalIn: {
+          '0%': { opacity: '0', transform: 'scale(0.92) translateY(12px)' },
+          '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+        },
+        spin_slow: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
+        ping_dot: {
+          '75%, 100%': { transform: 'scale(2)', opacity: '0' },
+        },
+        wiggle: {
+          '0%, 100%': { transform: 'rotate(-2deg)' },
+          '50%': { transform: 'rotate(2deg)' },
+        },
+        countUp: {
+          '0%': { opacity: '0', transform: 'translateY(4px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        ripple: {
+          '0%': { transform: 'scale(0)', opacity: '0.5' },
+          '100%': { transform: 'scale(4)', opacity: '0' },
         },
       },
       animation: {
-        pulse_soft: 'pulse_soft 2s ease-in-out infinite',
+        pulse_soft: 'pulse_soft 2.5s ease-in-out infinite',
         shimmer: 'shimmer 2s linear infinite',
-        fadeInUp: 'fadeInUp 0.3s ease-out both',
-        scaleIn: 'scaleIn 0.2s ease-out both',
+        fadeInUp: 'fadeInUp 0.35s cubic-bezier(0.16,1,0.3,1) both',
+        fadeInDown: 'fadeInDown 0.3s cubic-bezier(0.16,1,0.3,1) both',
+        fadeIn: 'fadeIn 0.25s ease-out both',
+        scaleIn: 'scaleIn 0.25s cubic-bezier(0.16,1,0.3,1) both',
+        scaleOut: 'scaleOut 0.2s ease-in both',
+        slideInRight: 'slideInRight 0.3s cubic-bezier(0.16,1,0.3,1) both',
+        slideInLeft: 'slideInLeft 0.3s cubic-bezier(0.16,1,0.3,1) both',
+        backdropIn: 'backdropIn 0.2s ease-out both',
+        modalIn: 'modalIn 0.3s cubic-bezier(0.16,1,0.3,1) both',
+        spin_slow: 'spin_slow 3s linear infinite',
+        ping_dot: 'ping_dot 1.5s cubic-bezier(0,0,0.2,1) infinite',
+        wiggle: 'wiggle 0.4s ease-in-out',
+        countUp: 'countUp 0.3s ease-out both',
+        ripple: 'ripple 0.6s ease-out both',
       },
     },
   },
