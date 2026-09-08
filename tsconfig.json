@@ -9,5 +9,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true
-  }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "frontend", "dist"]
 }
