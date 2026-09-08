@@ -1,6 +1,8 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
+import mongoSanitize from 'express-mongo-sanitize';
 import jobsRouter from './routes/jobs.js';
 
 const app: Express = express();
@@ -16,7 +18,9 @@ app.use(cors({
 
 
 // Middleware
+app.use(helmet()); // Secure HTTP headers
 app.use(express.json());
+app.use(mongoSanitize()); // Prevent NoSQL Injection
 
 // Global Rate Limiting
 const limiter = rateLimit({
