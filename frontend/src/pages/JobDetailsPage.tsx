@@ -7,6 +7,8 @@ import { StatusBadge } from '../components/StatusBadge';
 import { CopyPingUrl } from '../components/CopyPingUrl';
 import { getPingUrl } from '../api/jobsApi';
 import { EditJobModal } from '../components/EditJobModal';
+import { ProgressRing } from '../components/ProgressRing';
+import { PingHistoryChart } from '../components/PingHistoryChart';
 
 function formatInterval(seconds: number): string {
   if (seconds < 60) return `${seconds} seconds`;
@@ -48,6 +50,18 @@ export function JobDetailsPage() {
 
   const { job, pings } = data;
 
+  // Compute circular ring progress (0-1) through the current window
+  const windowMs = (job.expectedIntervalSeconds + (job.gracePeriodSeconds ?? 0)) * 1000;
+  const baseTime = job.lastPingAt ? new Date(job.lastPingAt).getTime() : new Date(job.createdAt).getTime();
+  const ringProgress = job.lastPingAt
+    ? Math.min(1, (Date.now() - baseTime) / windowMs)
+    : 0;
+
+  const ringLabel = job.lastPingAt
+    ? `${Math.round(ringProgress * 100)}%`
+    : 'No pings';
+  const ringSubLabel = job.lastPingAt ? 'elapsed' : 'yet';
+
   return (
     <main className="max-w-3xl mx-auto px-6 py-10 animate-fadeInUp">
       {/* Back */}
@@ -71,21 +85,30 @@ export function JobDetailsPage() {
         </div>
       </div>
 
-      {/* Details grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
-        {[
-          { label: 'Expected Interval', value: formatInterval(job.expectedIntervalSeconds) },
-          { label: 'Grace Period', value: formatInterval(job.gracePeriodSeconds) },
-          { label: 'Last Ping', value: job.lastPingAt ? formatDistanceToNow(new Date(job.lastPingAt), { addSuffix: true }) : 'Never' },
-          { label: 'Next Expected', value: job.nextExpectedPingAt ? formatDistanceToNow(new Date(job.nextExpectedPingAt), { addSuffix: true }) : '—' },
-          { label: 'Created', value: format(new Date(job.createdAt), 'MMM d, yyyy') },
-          { label: 'Last Alert', value: job.lastAlertSentAt ? formatDistanceToNow(new Date(job.lastAlertSentAt), { addSuffix: true }) : 'None' },
-        ].map(({ label, value }) => (
-          <div key={label} className="glass-card px-4 py-3">
-            <p className="text-xs text-slate-500 mb-0.5">{label}</p>
-            <p className="text-sm text-slate-200 font-medium">{value}</p>
-          </div>
-        ))}
+      {/* Progress Ring + Stats row */}
+      <div className="flex flex-col sm:flex-row items-center gap-6 glass-card p-6 mb-8">
+        <ProgressRing
+          progress={ringProgress}
+          status={job.status}
+          size={140}
+          label={ringLabel}
+          sublabel={ringSubLabel}
+        />
+        <div className="grid grid-cols-2 gap-3 flex-1 w-full">
+          {[
+            { label: 'Expected Interval', value: formatInterval(job.expectedIntervalSeconds) },
+            { label: 'Grace Period', value: formatInterval(job.gracePeriodSeconds) },
+            { label: 'Last Ping', value: job.lastPingAt ? formatDistanceToNow(new Date(job.lastPingAt), { addSuffix: true }) : 'Never' },
+            { label: 'Next Expected', value: job.nextExpectedPingAt ? formatDistanceToNow(new Date(job.nextExpectedPingAt), { addSuffix: true }) : '—' },
+            { label: 'Created', value: format(new Date(job.createdAt), 'MMM d, yyyy') },
+            { label: 'Last Alert', value: job.lastAlertSentAt ? formatDistanceToNow(new Date(job.lastAlertSentAt), { addSuffix: true }) : 'None' },
+          ].map(({ label, value }) => (
+            <div key={label} className="bg-white/[0.03] border border-white/5 rounded-lg px-4 py-3">
+              <p className="text-xs text-slate-500 mb-0.5">{label}</p>
+              <p className="text-sm text-slate-200 font-medium">{value}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Ping URLs */}
@@ -99,6 +122,11 @@ export function JobDetailsPage() {
           <CopyPingUrl url={getPingUrl(job.pingToken, '/start')} label="Start" />
           <CopyPingUrl url={getPingUrl(job.pingToken, '/fail')} label="Fail" />
         </div>
+      </div>
+
+      {/* 7-day ping activity chart */}
+      <div className="mb-8">
+        <PingHistoryChart pings={pings} expectedIntervalSeconds={job.expectedIntervalSeconds} />
       </div>
 
       {/* Ping history */}

@@ -5,6 +5,7 @@ import type { Job } from '../types/job';
 import { StatusBadge } from './StatusBadge';
 import { CopyPingUrl } from './CopyPingUrl';
 import { getPingUrl } from '../api/jobsApi';
+import { IntervalProgressBar } from './IntervalProgressBar';
 
 interface Props {
   job: Job;
@@ -66,6 +67,9 @@ export function JobCard({ job }: Props) {
           </span>
         )}
       </div>
+
+      {/* Interval progress */}
+      {job.lastPingAt && <IntervalProgressBar job={job} />}
 
       {/* Copy URL */}
       <div onClick={(e) => e.stopPropagation()}>
