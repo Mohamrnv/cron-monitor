@@ -5,6 +5,9 @@ import jobsRouter from './routes/jobs.js';
 
 const app: Express = express();
 
+// Trust the reverse proxy (like Railway, Heroku, Nginx) so rate limiter gets correct IPs
+app.set('trust proxy', 1);
+
 // CORS — allow the React frontend dev server (and future production domain)
 app.use(cors({
   origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
