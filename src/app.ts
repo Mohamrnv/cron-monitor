@@ -1,5 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
+import rateLimit from 'express-rate-limit';
 import jobsRouter from './routes/jobs.js';
 
 const app: Express = express();
@@ -13,6 +14,17 @@ app.use(cors({
 
 // Middleware
 app.use(express.json());
+
+// Global Rate Limiting
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute window
+  max: 100, // limit each IP to 100 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests from this IP, please try again after a minute.' },
+});
+app.use(limiter);
+
 
 // Basic health check route
 app.get('/health', (req: Request, res: Response) => {
