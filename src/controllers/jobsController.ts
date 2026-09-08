@@ -12,11 +12,15 @@ interface JobParams {
 export const jobsController = {
     createJob: async (req: Request<{}, {}, CreateJobDto>, res: Response) => {
         try {
-            const { name, expectedIntervalSeconds, gracePeriodSeconds } = req.body
+            const { name, expectedIntervalSeconds, gracePeriodSeconds, alertEmail } = req.body
 
             // Basic validation
             if (!name || !expectedIntervalSeconds) {
                 return res.status(400).json({ error: 'Name and expectedIntervalSeconds are required' });
+            }
+
+            if (alertEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(alertEmail)) {
+                return res.status(400).json({ error: 'Invalid alert email address' });
             }
 
             const gracePeriod = gracePeriodSeconds !== undefined ? gracePeriodSeconds : 300;
@@ -29,7 +33,8 @@ export const jobsController = {
                 expectedIntervalSeconds,
                 gracePeriodSeconds: gracePeriod,
                 pingToken: uuidv4(),
-                nextExpectedPingAt: nextExpected
+                nextExpectedPingAt: nextExpected,
+                ...(alertEmail ? { alertEmail } : {})
             });
 
             return res.status(201).json(newJob);
@@ -88,12 +93,18 @@ export const jobsController = {
     updateJob: async (req: Request<JobParams, {}, UpdateJobDto>, res: Response) => {
         try {
             const { id } = req.params;
-            const { name, expectedIntervalSeconds, gracePeriodSeconds } = req.body;
+            const { name, expectedIntervalSeconds, gracePeriodSeconds, alertEmail } = req.body;
 
             const updateData: any = {};
             if (name !== undefined) updateData.name = name;
             if (expectedIntervalSeconds !== undefined) updateData.expectedIntervalSeconds = expectedIntervalSeconds;
             if (gracePeriodSeconds !== undefined) updateData.gracePeriodSeconds = gracePeriodSeconds;
+            if (alertEmail !== undefined) {
+                if (alertEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(alertEmail)) {
+                    return res.status(400).json({ error: 'Invalid alert email address' });
+                }
+                updateData.alertEmail = alertEmail || null;
+            }
 
             if (Object.keys(updateData).length === 0) {
                 return res.status(400).json({ error: 'No fields provided for update' });

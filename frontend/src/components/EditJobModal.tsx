@@ -32,6 +32,7 @@ export function EditJobModal({ job, onClose }: Props) {
   const grace = fromSeconds(job.gracePeriodSeconds);
   const [graceValue, setGraceValue] = useState(grace.value);
   const [graceUnit, setGraceUnit] = useState<Unit>(grace.unit);
+  const [alertEmail, setAlertEmail] = useState(job.alertEmail ?? '');
 
   const { mutateAsync, isPending } = useUpdateJob();
 
@@ -43,6 +44,7 @@ export function EditJobModal({ job, onClose }: Props) {
         name,
         expectedIntervalSeconds: toSeconds(intervalValue, intervalUnit),
         gracePeriodSeconds: toSeconds(graceValue, graceUnit),
+        alertEmail: alertEmail.trim() || undefined,
       }
     });
     onClose();
@@ -117,6 +119,20 @@ export function EditJobModal({ job, onClose }: Props) {
               {unitSelect(graceUnit, setGraceUnit)}
             </div>
             <p className="text-xs text-slate-600">Extra tolerance before marking as Late/Down.</p>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-slate-400 font-medium">
+              Alert Email <span className="text-slate-600">(optional)</span>
+            </label>
+            <input
+              type="email"
+              value={alertEmail}
+              onChange={e => setAlertEmail(e.target.value)}
+              placeholder="e.g. ops@yourcompany.com"
+              className="input-field"
+            />
+            <p className="text-xs text-slate-600">Who should be notified when this job goes down? Overrides the global default.</p>
           </div>
 
           <div className="flex gap-3 pt-1">

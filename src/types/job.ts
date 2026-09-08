@@ -10,5 +10,6 @@ export interface Job {
   nextExpectedPingAt: Date | null;
   lastStartedAt: Date | null;
   lastAlertSentAt?: Date | null;
+  alertEmail?: string | null;
   createdAt: Date;
 }

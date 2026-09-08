@@ -5,7 +5,6 @@ import { AlertModel } from '../models/Alert.model.js';
 import nodemailer from 'nodemailer';
 
 // Use Mailtrap for development testing.
-// In production, these should be replaced with Resend/SendGrid/etc. credentials in .env
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || "sandbox.smtp.mailtrap.io",
     port: parseInt(process.env.SMTP_PORT || "2525"),
@@ -17,18 +16,21 @@ const transporter = nodemailer.createTransport({
 
 export const sendAlert = async (job: Job) => {
     const jobId = (job as any)._id || job.id;
-    
+
     logger.error(`🚨 ALERT: Job "${job.name}" (ID: ${jobId}) is DOWN!`);
 
     // 1. Send the email via Nodemailer
     try {
+        const toAddress = (job as any).alertEmail || process.env.ALERT_EMAIL || "admin@example.com";
+
         await transporter.sendMail({
-            from: '"Cron Monitor" <alerts@cron-monitor.local>', 
-            to: process.env.ALERT_EMAIL || "admin@example.com", // Who should receive the alerts
-            subject: `🚨 ALERT: Job "${job.name}" is DOWN!`, 
+            from: '"Cron Monitor" <alerts@cron-monitor.local>',
+            to: toAddress,
+            subject: `🚨 ALERT: Job "${job.name}" is DOWN!`,
             text: `Your monitored job "${job.name}" (ID: ${jobId}) has failed to ping in time and is currently marked as DOWN.\n\nLast Ping At: ${job.lastPingAt || 'Never'}\n\nPlease investigate.`,
         });
-        logger.info(`Alert email successfully dispatched for job "${job.name}"`);
+
+        logger.info(`Alert email successfully dispatched for job "${job.name}" to ${toAddress}`);
     } catch (error) {
         logger.error(`Failed to send alert email for job "${job.name}": ${error}`);
     }

@@ -11,6 +11,7 @@ export interface Job {
   nextExpectedPingAt: string | null;
   lastStartedAt: string | null;
   lastAlertSentAt: string | null;
+  alertEmail: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -27,10 +28,12 @@ export interface CreateJobDto {
   name: string;
   expectedIntervalSeconds: number;
   gracePeriodSeconds?: number;
+  alertEmail?: string;
 }
 
 export interface UpdateJobDto {
   name?: string;
   expectedIntervalSeconds?: number;
   gracePeriodSeconds?: number;
+  alertEmail?: string;
 }

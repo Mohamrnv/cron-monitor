@@ -23,6 +23,7 @@ export function CreateJobModal({ onClose }: Props) {
   const [intervalUnit, setIntervalUnit] = useState<Unit>('hours');
   const [graceValue, setGraceValue] = useState(5);
   const [graceUnit, setGraceUnit] = useState<Unit>('minutes');
+  const [alertEmail, setAlertEmail] = useState('');
   const [createdJob, setCreatedJob] = useState<Job | null>(null);
 
   const { mutateAsync, isPending } = useCreateJob();
@@ -33,6 +34,7 @@ export function CreateJobModal({ onClose }: Props) {
       name,
       expectedIntervalSeconds: toSeconds(intervalValue, intervalUnit),
       gracePeriodSeconds: toSeconds(graceValue, graceUnit),
+      ...(alertEmail.trim() ? { alertEmail: alertEmail.trim() } : {}),
     });
     setCreatedJob(job);
   };
@@ -124,6 +126,20 @@ export function CreateJobModal({ onClose }: Props) {
                 {unitSelect(graceUnit, setGraceUnit)}
               </div>
               <p className="text-xs text-slate-600">Extra tolerance before marking as Late/Down.</p>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs text-slate-400 font-medium">
+                Alert Email <span className="text-slate-600">(optional)</span>
+              </label>
+              <input
+                type="email"
+                value={alertEmail}
+                onChange={e => setAlertEmail(e.target.value)}
+                placeholder="e.g. ops@yourcompany.com"
+                className="input-field"
+              />
+              <p className="text-xs text-slate-600">Who should be notified when this job goes down? Overrides the global default.</p>
             </div>
 
             <div className="flex gap-3 pt-1">

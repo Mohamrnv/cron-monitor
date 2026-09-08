@@ -16,6 +16,7 @@ const jobSchema = new Schema<Job>({
   nextExpectedPingAt: { type: Date, default: null, index: true },
   lastStartedAt: { type: Date, default: null },
   lastAlertSentAt: { type: Date, default: null },
+  alertEmail: { type: String, default: null },
 }, { timestamps: true });
 
 export default mongoose.model('Job', jobSchema);
